@@ -1,4 +1,4 @@
-### 记录了android学习过程中的知识点
+记录了android学习过程中的知识点
 
 - 当你在Activity中使用内部类的时候，需要时刻考虑您是否可以控制该内部类的生命周期，如果不可以，则最好定义为静态内部类
 - TextView的任意文本变为链接：
@@ -15,3 +15,5 @@
       textView.setText(Html.fromHtml("<a href=\"http://www.baidu.com\">Your text here</a>"));
       textView.setMovementMethod(LinkMovementMethod.getInstance());
 ```
+
+- moveToBack(true)：把含有当前activity的task转移到后台。如果是false则当前activity为root activity才生效。
