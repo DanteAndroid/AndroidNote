@@ -64,6 +64,7 @@
 </resources>
 ```
 - strings.xml：用类似命名空间的方式来命名字符串。
+
 ```
 Bad
 
@@ -76,6 +77,7 @@ Good
 <string name="error.message.call">Call failed</string>
 <string name="error.message.map">Map loading failed</string>
 ```
+
 不要把字符串全大写，而是正常书写。如果需要全大写显示，直接用`textAllCaps`属性就行了。
 
-- 
+ 
