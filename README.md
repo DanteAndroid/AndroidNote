@@ -36,14 +36,8 @@
 你可以把一个大的style文件分割成几个文件。`styles.xml`的文件名没啥神奇的，重要的是文件里的<style>标签。因此你可以有style_home.xml, styles_item_details.xml之类的。不像build系统下的其他文件夹名，res/values
 下面的文件名可以很随意。
 - colors.xml是一个调色板。里面除了颜色名对应一个RGBA值不应该有其他东西，别这么搞：
-
-```
+ 
     <color name="button_foreground">#FFFFFF</color>
-    <color name="button_background">#2A91BD</color>
-    <color name="comment_background_inactive">#5F5F5F</color>
-    <color name="comment_background_active">#939393</color>
-    <color name="comment_foreground_important">#FF9D2F</color>
-    <color name="comment_shadow">#323232</color>
-```
+
 
  
