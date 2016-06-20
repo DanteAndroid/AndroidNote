@@ -33,7 +33,9 @@
     />
 ```
 你可以把一个大的style文件分割成几个文件。`styles.xml`的文件名没啥神奇的，重要的是文件里的<style>标签。因此你可以有style_home.xml, styles_item_details.xml之类的。不像build系统下的其他文件夹名，res/values
-下面的文件名可以很随意。
+下面的文件名可以很随意
+
+
 - colors.xml是一个调色板。里面除了颜色名对应一个RGBA值不应该有其他东西，
 - strings.xml：用类似命名空间的方式来命名字符串: error.message.map 
 ```
