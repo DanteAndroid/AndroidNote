@@ -38,20 +38,17 @@
 - colors.xml是一个调色板。里面除了颜色名对应一个RGBA值不应该有其他东西，别这么搞：
 
 ```
-<resources>
     <color name="button_foreground">#FFFFFF</color>
     <color name="button_background">#2A91BD</color>
     <color name="comment_background_inactive">#5F5F5F</color>
     <color name="comment_background_active">#939393</color>
     <color name="comment_foreground_important">#FF9D2F</color>
-    ...
     <color name="comment_shadow">#323232</color>
 ```
 
 应该这样：
 
 ```
-<resources>
     <!-- grayscale -->
     <color name="white"     >#FFFFFF</color>
     <color name="gray_light">#DBDBDB</color>
@@ -64,7 +61,6 @@
     <color name="blue">#2A91BD</color>
     <color name="orange">#FF9D2F</color>
     <color name="red">#FF432F</color>
-</resources>
 ```
 
 - strings.xml：用类似命名空间的方式来命名字符串。
