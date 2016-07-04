@@ -33,9 +33,9 @@
     />
 ```
 
-你可以把一个大的style文件分割成几个文件。`styles.xml`的文件名没啥神奇的，重要的是文件里的<style>标签。因此你可以有style_home.xml, styles_item_details.xml之类的。不像build系统下的其他文件夹名，res/values下面的文件名可以很随意
+你可以把一个大的style文件分割成几个文件。`styles.xml`的文件名没啥神奇的，重要的是文件里的<style>标签。因此你可以有style_home.xml, styles_item_details.xml之类的。不像build系统下的其他文件夹名，values下面的文件名可以很随意。
 
 - AS编译R文件丢失，常见原因是: 
-1. xml有错误
-2. res下面的资源文件格式有问题(如，jpeg的图片用的却是png的后缀)
+      1. xml有错误
+      2. res下面的资源文件格式有问题(如，jpeg的图片用的却是png的后缀)
 
