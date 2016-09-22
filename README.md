@@ -54,6 +54,7 @@
                         .setCustomAnimations(android.R.anim.slide_in_left(进入动画), android.R.anim.slide_out_right,
                                 android.R.anim.slide_in_left, android.R.anim.slide_out_right(退出动画))
                         .replace(R.id.fragment_container, new RRFragment())
+                        //当前transition加入回退栈，即，点击返回可以回到replace之前的状态
                         .addToBackStack("")
                         .commit();
 ```
