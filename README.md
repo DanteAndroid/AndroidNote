@@ -2,9 +2,9 @@
 ```
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.squareup:otto:1.3.8'
-    compile 'com.squareup.retrofit2:retrofit:2.0.0'             // 会引用 okHttp
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0'       // 会引用 Gson
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0'       // 会引用 RxJava
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'             // 会引用 okHttp
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'       // 会引用 Gson
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'       // 会引用 RxJava
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
 ```
