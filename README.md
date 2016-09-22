@@ -48,5 +48,13 @@
 
 - animator写动画效果时，遇到`java.lang.IllegalStateException: Already started!`错误，是因为没有setListen()。因为之前已经使用了`animate()`方法并且setListener了，所以这个错误是由于用的是之前的listener对象造成的。
 
-- 
+- fragment自定义动画时，方法应该写在replace(or add)前面，否则不会生效，例如：
+```
+                getSupportFragmentManager().beginTransaction()
+                        .setCustomAnimations(android.R.anim.slide_in_left(进入动画), android.R.anim.slide_out_right,
+                                android.R.anim.slide_in_left, android.R.anim.slide_out_right(退出动画))
+                        .replace(R.id.fragment_container, new RRFragment())
+                        .addToBackStack("")
+                        .commit();
+```
 
