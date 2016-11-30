@@ -79,4 +79,4 @@
 - [依赖冲突的解决方案](http://crushingcode.co/the-curious-case-of-dependency-conflicts/)，[参考]（https://docs.gradle.org/current/dsl/org.gradle.api.artifacts.ResolutionStrategy.html）
 - [避免内存泄露](http://blog.nimbledroid.com/2016/09/06/stop-memory-leaks.html)
 - [资源命名格式](http://jeroenmols.com/blog/2016/03/07/resourcenaming/)
-- 
+- [用Handler替代Timer](http://www.mopri.de/2010/timertask-bad-do-it-the-android-way-use-a-handler/)
