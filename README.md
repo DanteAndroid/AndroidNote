@@ -74,4 +74,9 @@
 - 调试时，子线程中的断点应该在debugger初始化之后（运行后）再选择，否则可能不会被触发。
 - `logm` - Log current method name and its arguments ; `logr` - Log result of the current method ; `noInstance` - private empty constructor to prohibit instance creation
 - 调试技巧：按下home，然后在terminal中输入adb shell am kill com.your.packagename即可模拟杀掉后台
+- Try to understand and follow TDD (Test Driven Development) ; Follow the DRY principle DRY = Do not Repeat Yourself
+- [Package by Feature, not layers](https://medium.com/the-engineering-team/package-by-features-not-layers-2d076df1964d)
+- [依赖冲突的解决方案](http://crushingcode.co/the-curious-case-of-dependency-conflicts/)，[参考]（https://docs.gradle.org/current/dsl/org.gradle.api.artifacts.ResolutionStrategy.html）
+- [避免内存泄露](http://blog.nimbledroid.com/2016/09/06/stop-memory-leaks.html)
+- [资源命名格式](http://jeroenmols.com/blog/2016/03/07/resourcenaming/)
 - 
