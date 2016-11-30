@@ -70,3 +70,8 @@
 ```
 
 - 项目的包应该优先按照功能（模块）划分，而非类型
+- 程序跑起来不意味着会按预期一样运行。把调试当做是补充知识点的机会；总有一天你会发现，比起写代码你会花更多时间在调试bug上面。
+- 调试时，子线程中的断点应该在debugger初始化之后（运行后）再选择，否则可能不会被触发。
+- `logm` - Log current method name and its arguments ; `logr` - Log result of the current method ; `noInstance` - private empty constructor to prohibit instance creation
+- 调试技巧：按下home，然后在terminal中输入adb shell am kill com.your.packagename即可模拟杀掉后台
+- 
