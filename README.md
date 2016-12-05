@@ -80,3 +80,4 @@
 - [避免内存泄露](http://blog.nimbledroid.com/2016/09/06/stop-memory-leaks.html)
 - [资源命名格式](http://jeroenmols.com/blog/2016/03/07/resourcenaming/)
 - [用Handler替代Timer](http://www.mopri.de/2010/timertask-bad-do-it-the-android-way-use-a-handler/)
+- 在新的task中打开activity：M1. launchMode="singleTask" + android:taskAffinity="new.package.name" 在启动一个singleTask的Activity实例时，如果系统中已经存在这样一个实例，就会将这个实例调度到任务栈的栈顶，并清除它当前所在任务中位于它上面的所有的activity。 M2. `intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);` + android:taskAffinity="new.package.name" 
