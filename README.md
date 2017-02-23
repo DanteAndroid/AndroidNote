@@ -97,16 +97,16 @@
                 <data android:host="link"
                       android:scheme="dante"/>
             </intent-filter>
-``
+```
 
 接受数据（启动activity中）：
 
 ```
-        Uri uri = getIntent().getData();
-        if (uri != null) {
-            String channel = uri.getQueryParameter("channel");
-            String data = uri.getQueryParameter("data");
+Uri uri = getIntent().getData();
+if (uri != null) {
+     String channel = uri.getQueryParameter("channel");
+     String data = uri.getQueryParameter("data");
 
-            Log.i(TAG, "test: receive Uri, channel:" + channel + " data: " + data);
-        }
+     Log.i(TAG, "test: receive Uri, channel:" + channel + " data: " + data);
+}
 ```
