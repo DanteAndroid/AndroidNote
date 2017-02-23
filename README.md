@@ -84,3 +84,29 @@
 -   以singleInstance模式启动的Activity具有全局唯一性，即整个系统中只会存在一个这样的实例
     以singleInstance模式启动的Activity具有独占性，即它会独自占用一个任务，被他开启的任何activity都会运行在其他任务中（官方文档上的描述为，      singleInstance模式的Activity不允许其他Activity和它共存在一个任务中）
     被singleInstance模式的Activity开启的其他activity，能够开启一个新任务，但不一定开启新的任务，也可能在已有的一个任务中开启
+
+- Deep Link的配置(添加到启动Activity的清单文件下)，可以用adb测试是否正常启动`adb shell am start -W -a android.intent.action.VIEW  -d "dante://link" com.your.package`:
+
+```
+            <!-- deep link 不能通过直接在浏览器输入网址测试 -->
+            <!-- 而是直接在网页源码中加入 <a href="mj://link"></a>  -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="link"
+                      android:scheme="dante"/>
+            </intent-filter>
+``
+
+接受数据（启动activity中）：
+
+```
+        Uri uri = getIntent().getData();
+        if (uri != null) {
+            String channel = uri.getQueryParameter("channel");
+            String data = uri.getQueryParameter("data");
+
+            Log.i(TAG, "test: receive Uri, channel:" + channel + " data: " + data);
+        }
+```
