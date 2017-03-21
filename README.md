@@ -117,3 +117,13 @@ if (uri != null) {
                 android:inputType="text" 
                 android:maxLines="1"
 ```
+- fragment 事务的动画必须写在add/replace前面，否则无效：
+```
+   getActivity().getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right
+                        , android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .hide(this)
+                .add(R.id.container, f)
+                .addToBackStack("")
+                .commit();
+```
