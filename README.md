@@ -110,3 +110,10 @@ if (uri != null) {
      Log.i(TAG, "test: receive Uri, channel:" + channel + " data: " + data);
 }
 ```
+
+- EditText 的 imeOptions 设置 action 的时候需要跟 inputType合用才有效：
+```
+               android:imeOptions="actionNext"
+                android:inputType="text" 
+                android:maxLines="1"
+```
