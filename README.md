@@ -129,3 +129,41 @@ if (uri != null) {
 ```
 
 - 关于从fragment到 Activity中的fragment，如果在Activity中设置transition，则不会生效（会是默认的fade transition）哪怕你在fragment中调用activity.startPostponeEnterTransition也不行。但是sharedelement是可以正常transition的。如果需要transition，建议直接在fragment中加（记得在onCreate里setTransition而不是onCreateView）【注：目前看起来结论是这样，后期可能会修复，也可能是我自己写法有问题】
+
+- jenkins自动化配置：
+——————————————————————————
+一.安装jenkins----使用命令行
+
+安装jenkins
+$ brew install jenkins
+
+启动jenkins
+$ jenkins
+
+卸载jenkins
+$ brew uninstall jenkins
+
+如果brew无效，安装homebrew
+$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+
+二. 打开 http://localhost:8080/
+
+三. JDK配置
+$ /usr/libexec/java_home
+e.g.	/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home
+
+四. SDK配置
+设置——系统设置——Environment variables √
+ANDROID_HOME
+/Users/yons/Documents/android-sdk-macosx
+
+五. Gradle配置
+设置——全局工具配置——Gradle
+Name：Gradle，Install automatically √
+
+五. 项目配置
+Pass all job parameters as Project properties √
+——————————————————————————
+
+- 
