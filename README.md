@@ -132,6 +132,7 @@ if (uri != null) {
 
 - jenkins自动化配置：
 ——————————————————————————
+
 一.安装jenkins----使用命令行
 
 安装jenkins
@@ -164,6 +165,7 @@ Name：Gradle，Install automatically √
 
 五. 项目配置
 Pass all job parameters as Project properties √
+
 ——————————————————————————
 
 - 
