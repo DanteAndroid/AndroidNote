@@ -168,4 +168,12 @@ Pass all job parameters as Project properties √
 
 ——————————————————————————
 
-- 
+- 使AlertDialog的文本可点击：
+```
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("关于应用")
+                    .setMessage("You message...  <a href="http://your.link">点这里</a> blah blah")
+                    .setPositiveButton("检查更新", (dialog1, which) -> AppUtil.goMarket(MainActivity.this))
+                    .show();
+            ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+```
