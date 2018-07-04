@@ -177,3 +177,5 @@ Pass all job parameters as Project properties √
                     .show();
             ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
 ```
+
+- [如何写一个注解处理器（APT）](http://hannesdorfmann.com/annotation-processing/annotationprocessing101)
