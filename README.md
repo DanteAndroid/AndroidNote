@@ -1,14 +1,3 @@
-工具庫(Updating):
-```
-    compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'com.squareup:otto:1.3.8'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'             // 会引用 okHttp
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'       // 会引用 Gson
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'       // 会引用 RxJava
-    compile 'io.reactivex:rxandroid:1.1.0'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-```
-
 - 最强AS写代码神器 [Exynap](http://exynap.com/)
 - 当你在Activity中使用内部类的时候，需要时刻考虑您是否可以控制该内部类的生命周期，如果不可以，则最好定义为静态内部类
 - TextView的任意文本变为链接：
@@ -179,3 +168,4 @@ Pass all job parameters as Project properties √
 ```
 
 - [如何写一个注解处理器（APT）](http://hannesdorfmann.com/annotation-processing/annotationprocessing101)
+- 在 Activity 中显示 Dialog / DialogFragment，不会走 onPause。仅当你的Activity 不在栈（stack）顶时，才会走 onPause。DialogFragment 生命周期是与 Activity 绑定的
