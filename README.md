@@ -233,3 +233,9 @@ Pass all job parameters as Project properties √
       }
   
   ```
+ - 项目运行时提示 Gradle 被锁（Timeout waiting to lock file hash cache 之类的）：
+ ```
+    find ~/.gradle -type f -name "*.lock" -delete
+    
+    find /ProjectPath/.gradle -type f -name "*.lock" | while read f; do rm $f; done
+ ```
