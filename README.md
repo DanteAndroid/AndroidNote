@@ -5,9 +5,7 @@ Also checkout:
 
 # Android Note
 
-- 最强AS写代码神器 [Exynap](http://exynap.com/)
 - [性能优化](https://www.jianshu.com/p/7d31399b98c7) & [布局优化](https://www.jianshu.com/p/4e665e96b590)
-- 当你在Activity中使用内部类的时候，需要时刻考虑您是否可以控制该内部类的生命周期，如果不可以，则最好定义为静态内部类
 - TextView的任意文本变为链接：
 ```
       //First make sure TextView not set "autoLink" property
@@ -44,7 +42,6 @@ Also checkout:
 
 - 你可以把一个大的style文件分割成几个文件。`styles.xml`的文件名没啥神奇的，重要的是文件里的`<style>`标签。因此你可以有style_home.xml, styles_item_details.xml之类的。不像build系统下的其他文件夹名，values下面的文件名可以很随意。
 - AS编译R文件丢失，常见原因是: 1. xml有错误 2. res下面的资源文件格式有问题(如，jpeg的图片用的却是png的后缀)
-- [app框架搭建笔记](http://www.jianshu.com/p/3b3932d3afab)
 - **Transition转场动画**
       0. EnterTransition顾名思义进入activity时的动画，在进入的activity的onCreate中设置，ReenterTransition即从之前打开的activity返回来时的动画（第二次回到这个activity）。这两个动画都是进入动画，即现在打开这个activity时的动画; ReturnTransition返回动画，即窗口关闭时（如在此activity时点击back时）呈现的动画。ExitTransition退出动画，在此activity中跳转到新的activity时的动画，需要跟returnTransition做区别。这两个动画都是离开动画，即现在离开这个activity的动画；setAllowEnterTransitionOverlap是否允许第一次进入这个activity时的动画(EnterTransition)覆盖。setAllowReturnTransitionOverlap是否允许返回这个activity时的动画(ReenterTransition)覆盖，如果是，那么返回这个activity的动画立刻执行。
       1.Return和Reenter Transitions分别是Enter和Exit的反向动画（如果没有特别设置的话）
@@ -52,28 +49,10 @@ Also checkout:
       2. 代码中设置： getWindow().setXXXTransition(transition);这里的transition对象可以直接new。有Slide, Explode, Fade三种默认的动画。
       3. Transition默认会应用到View树的所有view上，但是用`addTarget()`可以单独为某些view应用动画。      
 
-
 - animator写动画效果时，遇到`java.lang.IllegalStateException: Already started!`错误，是因为没有setListen()。因为之前已经使用了`animate()`方法并且setListener了，所以这个错误是由于用的是之前的listener对象造成的。
-
-- fragment自定义动画时，方法应该写在replace(or add)前面，否则不会生效，例如：
-```
-                getSupportFragmentManager().beginTransaction()
-                        .setCustomAnimations(android.R.anim.slide_in_left(进入动画), android.R.anim.slide_out_right,
-                                android.R.anim.slide_in_left, android.R.anim.slide_out_right(退出动画))
-                        .replace(R.id.fragment_container, new RRFragment())
-                        //当前transition加入回退栈，即，点击返回可以回到replace之前的状态
-                        .addToBackStack("")
-                        .commit();
-```
-
-- 项目的包应该优先按照功能（模块）划分，而非类型
-- 程序跑起来不意味着会按预期一样运行。把调试当做是补充知识点的机会；总有一天你会发现，比起写代码你会花更多时间在调试bug上面。
 - 调试时，子线程中的断点应该在debugger初始化之后（运行后）再选择，否则可能不会被触发。
-- `logm` - Log current method name and its arguments ; `logr` - Log result of the current method ; `noInstance` - private empty constructor to prohibit instance creation
 - 调试技巧：按下home，然后在terminal中输入adb shell am kill com.your.packagename即可模拟杀掉后台
 - Try to understand and follow TDD (Test Driven Development) ; Follow the DRY principle DRY = Do not Repeat Yourself
-- [Package by Feature, not layers](https://medium.com/the-engineering-team/package-by-features-not-layers-2d076df1964d)
-- [依赖冲突的解决方案](http://crushingcode.co/the-curious-case-of-dependency-conflicts/)，[参考]（https://docs.gradle.org/current/dsl/org.gradle.api.artifacts.ResolutionStrategy.html）
 - [避免内存泄露](http://blog.nimbledroid.com/2016/09/06/stop-memory-leaks.html)
 - [资源命名格式](http://jeroenmols.com/blog/2016/03/07/resourcenaming/)
 - [用Handler替代Timer](http://www.mopri.de/2010/timertask-bad-do-it-the-android-way-use-a-handler/)
@@ -95,7 +74,6 @@ Also checkout:
                       android:scheme="dante"/>
             </intent-filter>
 ```
-
 接受数据（启动activity中）：
 
 ```
@@ -114,22 +92,12 @@ if (uri != null) {
                 android:inputType="text" 
                 android:maxLines="1"
 ```
-- fragment 事务的动画必须写在add/replace前面，否则无效：
-```
-   getActivity().getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right
-                        , android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-                .hide(this)
-                .add(R.id.container, f)
-                .addToBackStack("")
-                .commit();
-```
 
 - 关于从fragment到 Activity中的fragment，如果在Activity中设置transition，则不会生效（会是默认的fade transition）哪怕你在fragment中调用activity.startPostponeEnterTransition也不行。但是sharedelement是可以正常transition的。如果需要transition，建议直接在fragment中加（记得在onCreate里setTransition而不是onCreateView）【注：目前看起来结论是这样，后期可能会修复，也可能是我自己写法有问题】
 
 - jenkins自动化配置：
-——————————————————————————
 
+```
 一.安装jenkins----使用命令行
 
 安装jenkins
@@ -143,7 +111,6 @@ $ brew uninstall jenkins
 
 如果brew无效，安装homebrew
 $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
 
 二. 打开 http://localhost:8080/
 
@@ -162,8 +129,7 @@ Name：Gradle，Install automatically √
 
 五. 项目配置
 Pass all job parameters as Project properties √
-
-——————————————————————————
+```
 
 - 使AlertDialog的文本可点击：
 ```
@@ -216,27 +182,19 @@ Pass all job parameters as Project properties √
           shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
           shareIntent.setType("*/*");
   ```
-
-- 统计类SDK如友盟没有数据：虽然集成了SDK，但是没有在 Activity 的生命周期中加入相应的函数如：
-
-  ```
-  
-      @Override
-      protected void onResume() {
-          super.onResume();
-          MobclickAgent.onResume(this); //统计时长
-      }
-  
-      @Override
-      protected void onPause() {
-          super.onPause();
-          MobclickAgent.onPause(this); //统计时长
-      }
-  
-  ```
  - 项目运行时提示 Gradle 被锁（Timeout waiting to lock file hash cache 之类的）：
  ```
     find ~/.gradle -type f -name "*.lock" -delete
     
     find /ProjectPath/.gradle -type f -name "*.lock" | while read f; do rm $f; done
  ```
+ - 双缓冲机制
+ 
+问题的由来
+CPU访问内存的速度要远远快于访问屏幕的速度。如果需要绘制大量复杂的图像时，每次都一个个从内存中读取图形然后绘制到屏幕就会造成多次地访问屏幕，从而导致效率很低。这就跟CPU和内存之间还需要有三级缓存一样，需要提高效率。
+
+第一层缓冲
+在绘制图像时不用上述一个一个绘制的方案，而采用先在内存中将所有的图像都绘制到一个Bitmap对象上，然后一次性将内存中的Bitmap绘制到屏幕，从而提高绘制的效率。Android中View的onDraw()方法已经实现了这一层缓冲。onDraw()方法中不是绘制一点显示一点，而是都绘制完后一次性显示到屏幕。
+
+第二层缓冲
+onDraw()方法的Canvas对象是和屏幕关联的，而onDraw()方法是运行在UI线程中的，如果要绘制的图像过于复杂，则有可能导致应用程序卡顿，甚至ANR。因此我们可以先创建一个临时的Canvas对象，将图像都绘制到这个临时的Canvas对象中，绘制完成之后再将这个临时Canvas对象中的内容(也就是一个Bitmap)，通过drawBitmap()方法绘制到onDraw()方法中的canvas对象中。这样的话就相当于是一个Bitmap的拷贝过程，比直接绘制效率要高，可以减少对UI线程的阻塞。
