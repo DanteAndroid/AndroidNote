@@ -198,3 +198,22 @@ CPU访问内存的速度要远远快于访问屏幕的速度。如果需要绘�
 
 第二层缓冲
 onDraw()方法的Canvas对象是和屏幕关联的，而onDraw()方法是运行在UI线程中的，如果要绘制的图像过于复杂，则有可能导致应用程序卡顿，甚至ANR。因此我们可以先创建一个临时的Canvas对象，将图像都绘制到这个临时的Canvas对象中，绘制完成之后再将这个临时Canvas对象中的内容(也就是一个Bitmap)，通过drawBitmap()方法绘制到onDraw()方法中的canvas对象中。这样的话就相当于是一个Bitmap的拷贝过程，比直接绘制效率要高，可以减少对UI线程的阻塞。
+
+- SurfaceView VS TextureView
+```
+SurfaceView
+
+- WMS中单独创建窗口
+- 可以在子线程刷新画面
+- 双缓冲机制（更新视图时用了两张Canvas）
+- 不可进行旋转缩放等动画
+- 适合2D游戏和视频播放器开发
+
+TextureView
+
+- 作为View hierachy中的普通View
+- 单独的渲染线程
+- 必须在硬件加速的窗口中
+- 适合视频播放器或者相机开发
+- 内存占用比SurfaceView高
+```
