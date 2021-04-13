@@ -122,8 +122,6 @@ CPU访问内存的速度要远远快于访问屏幕的速度。如果需要绘�
 第二层缓冲
 onDraw()方法的Canvas对象是和屏幕关联的，而onDraw()方法是运行在UI线程中的，如果要绘制的图像过于复杂，则有可能导致应用程序卡顿，甚至ANR。因此我们可以先创建一个临时的Canvas对象，将图像都绘制到这个临时的Canvas对象中，绘制完成之后再将这个临时Canvas对象中的内容(也就是一个Bitmap)，通过drawBitmap()方法绘制到onDraw()方法中的canvas对象中。这样的话就相当于是一个Bitmap的拷贝过程，比直接绘制效率要高，可以减少对UI线程的阻塞。
 
-## 常用技巧
-
 ### Gradle currently uased 问题
 
 find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done
