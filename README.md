@@ -66,15 +66,6 @@ if (uri != null) {
 }
 ```
 
-- EditText 的 imeOptions 设置 action 的时候需要跟 inputType合用才有效：
-```
-               android:imeOptions="actionNext"
-                android:inputType="text" 
-                android:maxLines="1"
-```
-
-- 关于从fragment到 Activity中的fragment，如果在Activity中设置transition，则不会生效（会是默认的fade transition）哪怕你在fragment中调用activity.startPostponeEnterTransition也不行。但是sharedelement是可以正常transition的。如果需要transition，建议直接在fragment中加（记得在onCreate里setTransition而不是onCreateView）【注：目前看起来结论是这样，后期可能会修复，也可能是我自己写法有问题】
-
 ### jenkins自动化配置：
 
 ```
@@ -255,3 +246,12 @@ find usage点击设置图标，点击三个点新增scope，输入规则：`!fil
           shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
           shareIntent.setType("*/*");
   ```
+
+- EditText 的 imeOptions 设置 action 的时候需要跟 inputType合用才有效：
+```
+               android:imeOptions="actionNext"
+                android:inputType="text" 
+                android:maxLines="1"
+```
+
+- 关于从fragment到 Activity中的fragment，如果在Activity中设置transition，则不会生效（会是默认的fade transition）哪怕你在fragment中调用activity.startPostponeEnterTransition也不行。但是sharedelement是可以正常transition的。如果需要transition，建议直接在fragment中加（记得在onCreate里setTransition而不是onCreateView）【注：目前看起来结论是这样，后期可能会修复，也可能是我自己写法有问题】
