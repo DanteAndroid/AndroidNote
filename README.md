@@ -6,7 +6,7 @@ Also checkout:
 # Android Note
 
 - [性能优化](https://www.jianshu.com/p/7d31399b98c7) & [布局优化](https://www.jianshu.com/p/4e665e96b590)
-- TextView的任意文本变为链接：
+### TextView的任意文本变为链接
 ```
       //First make sure TextView not set "autoLink" property
       //Method 1
@@ -22,27 +22,10 @@ Also checkout:
 ```
 
 - moveToBack(true)：把含有当前activity的task转移到后台。如果是false则当前activity为root activity才生效。
-- 一般来说，`android:layout_****`属性应该定义在布局文件里，而其他属性`android:****`应该放在style的XML文件里。这个规则的思想是保持布局和内容属性（位置、margin、尺寸）在layout文件里，保持显示细节（颜色、padding、字体）在style文件里。例外情况是：`android:id`和LinearLayout的`android:iorientation`显然应该放在layout文件里；`android:text`应该在layout文件因为它定义了内容；有时候可以把layout_width和layout——height放在style文件里来做成通用样式，但是默认是要放在layout里面。
 - 要用styles。几乎每个项目都得合适地使用styles，因为对于view来说有重复的外观是很常见的。至少你得给app的大部分文本内容定义一个通用样式：
-
-```
-<style name="ContentText">
-    <item name="android:textSize">@dimen/font_normal</item>
-    <item name="android:textColor">@color/basic_black</item>
-</style>
-
-//Applied to TextViews:
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/price"
-    style="@style/ContentText"
-    />
-```
-
 - 你可以把一个大的style文件分割成几个文件。`styles.xml`的文件名没啥神奇的，重要的是文件里的`<style>`标签。因此你可以有style_home.xml, styles_item_details.xml之类的。不像build系统下的其他文件夹名，values下面的文件名可以很随意。
 - AS编译R文件丢失，常见原因是: 1. xml有错误 2. res下面的资源文件格式有问题(如，jpeg的图片用的却是png的后缀)
-- **Transition转场动画**
+### Transition转场动画
       0. EnterTransition顾名思义进入activity时的动画，在进入的activity的onCreate中设置，ReenterTransition即从之前打开的activity返回来时的动画（第二次回到这个activity）。这两个动画都是进入动画，即现在打开这个activity时的动画; ReturnTransition返回动画，即窗口关闭时（如在此activity时点击back时）呈现的动画。ExitTransition退出动画，在此activity中跳转到新的activity时的动画，需要跟returnTransition做区别。这两个动画都是离开动画，即现在离开这个activity的动画；setAllowEnterTransitionOverlap是否允许第一次进入这个activity时的动画(EnterTransition)覆盖。setAllowReturnTransitionOverlap是否允许返回这个activity时的动画(ReenterTransition)覆盖，如果是，那么返回这个activity的动画立刻执行。
       1.Return和Reenter Transitions分别是Enter和Exit的反向动画（如果没有特别设置的话）
       1. xml中设置：在activity的主题中添加<item name="android:windowXXXTransition">@transition/CustomTransitionXML</item>其中自自定义的transition文件在res/transition下面，根元素是transitionSet
@@ -50,18 +33,15 @@ Also checkout:
       3. Transition默认会应用到View树的所有view上，但是用`addTarget()`可以单独为某些view应用动画。      
 
 - animator写动画效果时，遇到`java.lang.IllegalStateException: Already started!`错误，是因为没有setListen()。因为之前已经使用了`animate()`方法并且setListener了，所以这个错误是由于用的是之前的listener对象造成的。
-- 调试时，子线程中的断点应该在debugger初始化之后（运行后）再选择，否则可能不会被触发。
 - 调试技巧：按下home，然后在terminal中输入adb shell am kill com.your.packagename即可模拟杀掉后台
-- Try to understand and follow TDD (Test Driven Development) ; Follow the DRY principle DRY = Do not Repeat Yourself
-- [避免内存泄露](http://blog.nimbledroid.com/2016/09/06/stop-memory-leaks.html)
-- [资源命名格式](http://jeroenmols.com/blog/2016/03/07/resourcenaming/)
 - [用Handler替代Timer](http://www.mopri.de/2010/timertask-bad-do-it-the-android-way-use-a-handler/)
-- 在新的task中打开activity：M1. launchMode="singleTask" + android:taskAffinity="new.package.name" 在启动一个singleTask的Activity实例时，如果系统中已经存在这样一个实例，就会将这个实例调度到任务栈的栈顶，并清除它当前所在任务中位于它上面的所有的activity。 M2. `intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);` + android:taskAffinity="new.package.name" 
+- 在新的task中打开activity：M1. launchMode="singleTask" + android:taskAffinity="new.package.name" 在启动一个singleTask的Activity实例时，如果系统中已经存在这样一个实例，就会将这个实例调度到任务栈的栈顶，并清除它当前所在任务中位于它上面的所有的activity。 M2. `intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);` + android:taskAffinity="new.package.name"
 -   以singleInstance模式启动的Activity具有全局唯一性，即整个系统中只会存在一个这样的实例
     以singleInstance模式启动的Activity具有独占性，即它会独自占用一个任务，被他开启的任何activity都会运行在其他任务中（官方文档上的描述为，      singleInstance模式的Activity不允许其他Activity和它共存在一个任务中）
     被singleInstance模式的Activity开启的其他activity，能够开启一个新任务，但不一定开启新的任务，也可能在已有的一个任务中开启
 
-- Deep Link的配置(添加到启动Activity的清单文件下)，可以用adb测试是否正常启动`adb shell am start -W -a android.intent.action.VIEW  -d "dante://link" com.your.package`:
+### Deep Link的配置
+(添加到启动Activity的清单文件下)，可以用adb测试是否正常启动`adb shell am start -W -a android.intent.action.VIEW  -d "dante://link" com.your.package`:
 
 ```
             <!-- deep link 不能通过直接在浏览器输入网址测试 -->
@@ -95,7 +75,7 @@ if (uri != null) {
 
 - 关于从fragment到 Activity中的fragment，如果在Activity中设置transition，则不会生效（会是默认的fade transition）哪怕你在fragment中调用activity.startPostponeEnterTransition也不行。但是sharedelement是可以正常transition的。如果需要transition，建议直接在fragment中加（记得在onCreate里setTransition而不是onCreateView）【注：目前看起来结论是这样，后期可能会修复，也可能是我自己写法有问题】
 
-- jenkins自动化配置：
+### jenkins自动化配置：
 
 ```
 一.安装jenkins----使用命令行
@@ -182,13 +162,8 @@ Pass all job parameters as Project properties √
           shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
           shareIntent.setType("*/*");
   ```
- - 项目运行时提示 Gradle 被锁（Timeout waiting to lock file hash cache 之类的）：
- ```
-    find ~/.gradle -type f -name "*.lock" -delete
-    
-    find /ProjectPath/.gradle -type f -name "*.lock" | while read f; do rm $f; done
- ```
- - 双缓冲机制
+
+### 双缓冲机制
  
 问题的由来
 CPU访问内存的速度要远远快于访问屏幕的速度。如果需要绘制大量复杂的图像时，每次都一个个从内存中读取图形然后绘制到屏幕就会造成多次地访问屏幕，从而导致效率很低。这就跟CPU和内存之间还需要有三级缓存一样，需要提高效率。
@@ -199,21 +174,87 @@ CPU访问内存的速度要远远快于访问屏幕的速度。如果需要绘�
 第二层缓冲
 onDraw()方法的Canvas对象是和屏幕关联的，而onDraw()方法是运行在UI线程中的，如果要绘制的图像过于复杂，则有可能导致应用程序卡顿，甚至ANR。因此我们可以先创建一个临时的Canvas对象，将图像都绘制到这个临时的Canvas对象中，绘制完成之后再将这个临时Canvas对象中的内容(也就是一个Bitmap)，通过drawBitmap()方法绘制到onDraw()方法中的canvas对象中。这样的话就相当于是一个Bitmap的拷贝过程，比直接绘制效率要高，可以减少对UI线程的阻塞。
 
-- SurfaceView VS TextureView
-```
-SurfaceView
+## 常用技巧
 
-- WMS中单独创建窗口
+### Gradle currently uased 问题
+
+find ~/.gradle -type f -name "*.lock" | while read f; do rm $f; done
+
+find /Users/l/Documents/RRTrunk/.gradle -type f -name "*.lock" | while read f; do rm $f; done
+
+### 刷新DNS
+
+sudo killall -HUP mDNSResponder
+
+### AS搜索时排除生成类
+
+find usage点击设置图标，点击三个点新增scope，输入规则：`!file:*intermediates*/&&!file:*generated*/&&!lib:*..*`
+
+## ADB
+
+`adb tcpip 5555` --> `adb connect 192.168.*.*(设置-关于手机里面的ip)`
+
+`adb logcat -c` 清空日志
+
+`adb logcat -t 500` > dante.log 输出最近500行日志并保存到项目目录下的 dante.log 文件
+
+### SurfaceView 
+
+- **WMS中单独创建窗口**
 - 可以在子线程刷新画面
 - 双缓冲机制（更新视图时用了两张Canvas）
 - 不可进行旋转缩放等动画
 - 适合2D游戏和视频播放器开发
 
-TextureView
+### TextureView
 
-- 作为View hierachy中的普通View
+- **作为View hierachy中的普通View**
 - 单独的渲染线程
 - 必须在硬件加速的窗口中
 - 适合视频播放器或者相机开发
 - 内存占用比SurfaceView高
+
+### 事件分发
+
+ - 对于事件分发：（dispatchTouchEvent）
+ **如果想事件不向下传递，自己消费掉**  ：将当前的dispatchTouchEvent返回true；
+**如果想事件不向下传递，返回给上层**  ：将当前的dispatchTouchEvent返回false；
+ - 对于事件拦截：（onInterceptTouchEvent）
+ **如果想拦截事件，给自己的onTouchEvent方法消费** ：将onInterceptTouchEvent返回true
+**如果不拦截事件，默认向下（子view）传递** ：将onInterceptTouchEvent返回false或者返回默认值
+ - 对于事件消费：（onTouchEvent）
+ **如果不想消费，返回给上层** ：将onTouchEvent返回默认或者返回false；
+**如果想消费，不再返回** ：将onTouchEvent返回true；
+ - 当`dispatchTouchEvent（）`事件分发时，只有前一个事件（如ACTION_DOWN）返回true，才会收到后一个事件（ACTION_MOVE和ACTION_UP）
+ - onInterceptTouchEvent 并不能消费事件，它相当于是一个分叉口起到分流导流的作用，对后续的ACTION_MOVE和ACTION_UP事件接收起到非常大的作用
+ - 接收了ACTION_DOWN事件的函数不一定能收到后续事件
+
+### GestureDetector
+
+使用 SimpleOnGestureListener 时注意要 onDown 返回 true，否则不会接管触摸事件
+
 ```
+            root.setOnTouchListener(object : View.OnTouchListener {
+                private val detector = GestureDetectorCompat(context,
+                    object : GestureDetector.SimpleOnGestureListener() {
+                        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+                            if (doSomething()) return false
+                            return true
+                        }
+
+                        override fun onDoubleTap(e: MotionEvent?): Boolean {
+                            doSomeThingElse()
+                            return true
+                        }
+												
+                        override fun onDown(e: MotionEvent?): Boolean = true
+                    })
+
+                override fun onTouch(v: View?, event: MotionEvent?): Boolean =
+                    detector.onTouchEvent(event)
+            })
+```
+
+###  FAQ
+
+- sdk 初始化失败，可能是初始化所在的进程不对
