@@ -111,58 +111,6 @@ Name：Gradle，Install automatically √
 Pass all job parameters as Project properties √
 ```
 
-- 使AlertDialog的文本可点击：
-```
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("关于应用")
-                    .setMessage("You message...  <a href="http://your.link">点这里</a> blah blah")
-                    .setPositiveButton("检查更新", (dialog1, which) -> AppUtil.goMarket(MainActivity.this))
-                    .show();
-            ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
-```
-
-- [如何写一个注解处理器（APT）](http://hannesdorfmann.com/annotation-processing/annotationprocessing101)
-- 在 Activity 中显示 Dialog / DialogFragment，不会走 onPause。仅当你的Activity 不在栈（stack）顶时，才会走 onPause。DialogFragment 生命周期是与 Activity 绑定的
-
-- 在实体对象中，新增了属性，也正确赋值了，但是最后拿到的值却是默认值：调试发现，是通过 Intent 传过去后，值发生了变化。原来此对象实现了`Parcelable`，新增属性后需要也在相关方法中添加对应该属性的方法，否则肯定无法通过 Intent 传输
-
-- 在 shape 中，使用带有透明度的颜色 + corners 时，如果 corners 的值小于 stroke 边框的宽度的一半，会在拐角出出现重叠的现象。解决办法：调高 corners 值；或者禁用硬件加速：`view.setLayerType(View.LAYER_TYPE_SOFTWARE, null)`
-
-- ```
-  <?xml version="1.0" encoding="utf-8"?>
-  <shape xmlns:android="http://schemas.android.com/apk/res/android"
-         android:shape="rectangle">
-      <stroke
-          android:dashGap="10dp"
-          android:dashWidth="60dp"
-          android:width="8dp"
-          android:color="@color/frame"/>
-      <corners android:radius="5dp"/>
-  
-  </shape>
-  ```
-
-- 接近矩形的小圆点（不是椭圆），也可以用上一条 Shape + Corner 的方式做
-
-- ScaleX 和 ScaleY 只影响 View 的绘制（通过对原始矩阵变换后成为新矩阵），并不影响其宽高。其点击事件区域的变换是由于绘制时，原始矩阵和新矩阵的点进行了 mappoint
-
-- 动态的布局和 DialogFragment 中使用 ConstraintLayout 在部分机型会出现布局很奇怪的情况。
-
-- 分享图片到微信时，MIMEType 设为 image/* 会偶尔出现无法分享的问题，改为 `*/*` 后正常：
-
-  ```
-          Intent shareIntent = new Intent();
-          shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
-          ArrayList<Uri> files = new ArrayList<>();
-          for (String path : filePaths) {
-              File file = new File(path);
-              Uri uri = Uri.fromFile(file);
-              files.add(uri);
-          }
-          shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
-          shareIntent.setType("*/*");
-  ```
-
 ### 双缓冲机制
  
 问题的由来
@@ -255,6 +203,57 @@ find usage点击设置图标，点击三个点新增scope，输入规则：`!fil
             })
 ```
 
-###  FAQ
+###  其他技巧
 
 - sdk 初始化失败，可能是初始化所在的进程不对
+- 使AlertDialog的文本可点击：
+```
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("关于应用")
+                    .setMessage("You message...  <a href="http://your.link">点这里</a> blah blah")
+                    .setPositiveButton("检查更新", (dialog1, which) -> AppUtil.goMarket(MainActivity.this))
+                    .show();
+            ((TextView) dialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+```
+
+- [如何写一个注解处理器（APT）](http://hannesdorfmann.com/annotation-processing/annotationprocessing101)
+- 在 Activity 中显示 Dialog / DialogFragment，不会走 onPause。仅当你的Activity 不在栈（stack）顶时，才会走 onPause。DialogFragment 生命周期是与 Activity 绑定的
+
+- 在实体对象中，新增了属性，也正确赋值了，但是最后拿到的值却是默认值：调试发现，是通过 Intent 传过去后，值发生了变化。原来此对象实现了`Parcelable`，新增属性后需要也在相关方法中添加对应该属性的方法，否则肯定无法通过 Intent 传输
+
+- 在 shape 中，使用带有透明度的颜色 + corners 时，如果 corners 的值小于 stroke 边框的宽度的一半，会在拐角出出现重叠的现象。解决办法：调高 corners 值；或者禁用硬件加速：`view.setLayerType(View.LAYER_TYPE_SOFTWARE, null)`
+
+- ```
+  <?xml version="1.0" encoding="utf-8"?>
+  <shape xmlns:android="http://schemas.android.com/apk/res/android"
+         android:shape="rectangle">
+      <stroke
+          android:dashGap="10dp"
+          android:dashWidth="60dp"
+          android:width="8dp"
+          android:color="@color/frame"/>
+      <corners android:radius="5dp"/>
+  
+  </shape>
+  ```
+
+- 接近矩形的小圆点（不是椭圆），也可以用上一条 Shape + Corner 的方式做
+
+- ScaleX 和 ScaleY 只影响 View 的绘制（通过对原始矩阵变换后成为新矩阵），并不影响其宽高。其点击事件区域的变换是由于绘制时，原始矩阵和新矩阵的点进行了 mappoint
+
+- 动态的布局和 DialogFragment 中使用 ConstraintLayout 在部分机型会出现布局很奇怪的情况。
+
+- 分享图片到微信时，MIMEType 设为 image/* 会偶尔出现无法分享的问题，改为 `*/*` 后正常：
+
+  ```
+          Intent shareIntent = new Intent();
+          shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+          ArrayList<Uri> files = new ArrayList<>();
+          for (String path : filePaths) {
+              File file = new File(path);
+              Uri uri = Uri.fromFile(file);
+              files.add(uri);
+          }
+          shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+          shareIntent.setType("*/*");
+  ```
