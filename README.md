@@ -1,7 +1,7 @@
-Also checkout:
-- ### [Kotlin Note](/KotlinNote.md)
-- ### [Git Note](/GitNote.md)
-- ### [多渠道](/多渠道版本发布.md)
+- [Android面试题](/Android面试题总结.md)
+- [Kotlin笔记](/KotlinNote.md)
+- [Git笔记](/GitNote.md)
+- [多渠道](/多渠道版本发布.md)
 
 # Android Note
 
