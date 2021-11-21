@@ -1,7 +1,5 @@
 # Android面试题总结
 
-[toc]
-
 ## 事件分发
 
 事件分发就是把触摸事件传递到具体view的整个过程。事件类型包括`MotionEvent.ACTION_DOWN, ACTION_UP, ACTION_MOVE, ACTION_CANCEL`。
@@ -144,5 +142,5 @@ RecycledViewPool：缓存item的终点站，用于保存Removed、Changed以及m
 
 ## Glide
 
-todo
+TODO
 
