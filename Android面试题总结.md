@@ -149,4 +149,7 @@ RecycledViewPool：缓存item的终点站，用于保存Removed、Changed以及m
 ## Glide
 
 TODO
+    
+## Timber
 
+Timber内部维护tree的数组，通过synchronized保证添加tree时线程安全。tree是抽象类，封装了log的具体打印操作和tag，具体操作最终调用log虚方法，其中包含priority、tag、message、throwable。tag默认从ThreadLocal<String>里线程存的tag取，取不到则从`Throwable().stackTrack`的堆栈信息里解析第一个类名不属于Timber库的类名并生成对应Tag。Timber具体打印方法则会遍历treeArray依次执行log具体方法打印，DebugTree的log方法最终执行了`Log.println(priority, tag, message)`
