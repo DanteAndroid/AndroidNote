@@ -5,70 +5,6 @@
 
 # DevelopNote
 
-- Deep Link的配置
-
-  (添加到启动Activity的清单文件下)，可以用adb测试是否正常启动`adb shell am start -W -a android.intent.action.VIEW  -d "dante://link" com.your.package`:
-
-  ```
-              <!-- deep link 不能通过直接在浏览器输入网址测试 -->
-              <!-- 而是直接在网页源码中加入 <a href="mj://link"></a>  -->
-              <intent-filter>
-                  <action android:name="android.intent.action.VIEW"/>
-                  <category android:name="android.intent.category.DEFAULT"/>
-                  <category android:name="android.intent.category.BROWSABLE"/>
-                  <data android:host="link"
-                        android:scheme="dante"/>
-              </intent-filter>
-  ```
-
-  接受数据（启动activity中）：
-
-  ```
-  Uri uri = getIntent().getData();
-  if (uri != null) {
-       String channel = uri.getQueryParameter("channel");
-       String data = uri.getQueryParameter("data");
-  
-       Log.i(TAG, "test: receive Uri, channel:" + channel + " data: " + data);
-  }
-  ```
-
-  ### jenkins自动化配置：
-
-  ```
-  一.安装jenkins----使用命令行
-  
-  安装jenkins
-  $ brew install jenkins
-  
-  启动jenkins
-  $ jenkins
-  
-  卸载jenkins
-  $ brew uninstall jenkins
-  
-  如果brew无效，安装homebrew
-  $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  
-  二. 打开 http://localhost:8080/
-  
-  三. JDK配置
-  $ /usr/libexec/java_home
-  e.g.	/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home
-  
-  四. SDK配置
-  设置——系统设置——Environment variables √
-  ANDROID_HOME
-  /Users/yons/Documents/android-sdk-macosx
-  
-  五. Gradle配置
-  设置——全局工具配置——Gradle
-  Name：Gradle，Install automatically √
-  
-  五. 项目配置
-  Pass all job parameters as Project properties √
-  ```
-
   ### 双缓冲机制
 
   问题的由来
@@ -79,14 +15,6 @@
 
   第二层缓冲
   onDraw()方法的Canvas对象是和屏幕关联的，而onDraw()方法是运行在UI线程中的，如果要绘制的图像过于复杂，则有可能导致应用程序卡顿，甚至ANR。因此我们可以先创建一个临时的Canvas对象，将图像都绘制到这个临时的Canvas对象中，绘制完成之后再将这个临时Canvas对象中的内容(也就是一个Bitmap)，通过drawBitmap()方法绘制到onDraw()方法中的canvas对象中。这样的话就相当于是一个Bitmap的拷贝过程，比直接绘制效率要高，可以减少对UI线程的阻塞。
-
-  ### 刷新DNS
-
-  sudo killall -HUP mDNSResponder
-
-  ### AS搜索时排除生成类
-
-  find usage点击设置图标，点击三个点新增scope，输入规则：`!file:*intermediates*/&&!file:*generated*/&&!lib:*..*`
 
   ## ADB
 
@@ -127,32 +55,6 @@
    - onInterceptTouchEvent 并不能消费事件，它相当于是一个分叉口起到分流导流的作用，对后续的ACTION_MOVE和ACTION_UP事件接收起到非常大的作用
    - 接收了ACTION_DOWN事件的函数不一定能收到后续事件
 
-  ### GestureDetector
-
-  使用 SimpleOnGestureListener 时注意要 onDown 返回 true，否则不会接管触摸事件
-
-  ```
-              root.setOnTouchListener(object : View.OnTouchListener {
-                  private val detector = GestureDetectorCompat(context,
-                      object : GestureDetector.SimpleOnGestureListener() {
-                          override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
-                              if (doSomething()) return false
-                              return true
-                          }
-  
-                          override fun onDoubleTap(e: MotionEvent?): Boolean {
-                              doSomeThingElse()
-                              return true
-                          }
-  												
-                          override fun onDown(e: MotionEvent?): Boolean = true
-                      })
-  
-                  override fun onTouch(v: View?, event: MotionEvent?): Boolean =
-                      detector.onTouchEvent(event)
-              })
-  ```
-
   ###  其他技巧
 
   - sdk 初始化失败，可能是初始化所在的进程不对
@@ -185,21 +87,15 @@
 
   Flow是利用协程建造起来的，通过suspend和resume来同步生产者(flow)和消费者(collect或者其他terminal operator如toList)的执行。
 
-- popUpTo="A"是指pop到A，一定是pop到。比如栈里有A-B-C-A，从C到A的action制定了这个属性，那么就把B和C都pop掉并且生成A的新实例。再指定popUpToInclusive="true"则把第一个A也pop掉。如果再指定popUpToSaveState="true"则表示pop的时候保存他们的状态。之后通过navigate导航的时候，可以包含restoreSaveState="true"来恢复状态。
-
 - recyclerView动画是根据canReuseUpdatedViewHolder来决定是复用同一个ViewHolder来跑动画 or 复制一份ViewHolder并且itemAnimator用这俩item来跑动画。然后根据remove/add/move/change动作，存储对应的动作信息（如ChangeInfo），执行pending动画，顺序是移动、更新和添加。如果有删除动作，则每一步的最后都会执行删除动画。
 
 - 网络请求完成了，但是没走到response（liveData没触发回调），可能是线程问题。
 
 - 查看签名信息：keytool -list -v -keystore
 
-- 使用BottomSheetFragment时子fragment中需要添加根布局id为root，否则无法使用`by viewBinding`
-
 - 遇到无论如何keyboard也隐藏不了的情况，请先尝试注释掉第三方的方法比如：`KeyboardUtils.showSoftInput`，这些方法可能会导致键盘强制显示
 
 - includeFontPadding 设为 false 会导致underline不能显示。例如`<u>用户协议</u>`
-
-- 不要在log里直接打印包含gRPC的对象，否则会crash
 
 - SAM：Single Abstract Method，单一抽象方法接口或者functional interface，只具有一个无默认方法和默认属性的接口，比如`Runnable`类（只有一个run方法）和`OnClickListener`等。在kotlin中可以用 fun interface 定义
 
