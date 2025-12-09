@@ -363,6 +363,18 @@ Kotlin 协程提供了 **CoroutineDispatcher**，它决定协程在哪个线程�
   - State 是可观察对象，当其值改变时，会通知依赖它的 Composable 标记为脏。
   - Compose 内部使用 **Snapshot** 来追踪状态变化。
 
+**怎么实现自动追踪状态的**：
+Compose 的 state-driven 本质类似于“重写 get / set”，但是它比普通的 setter 通知机制更复杂和高效：
+	1.	get
+	•	读取状态时，Compose 会收集依赖，记录当前 Composable 与这个状态的关系。
+	•	这个过程在内部通过 slot table + snapshot 实现，不是普通的变量访问。
+	2.	set
+	•	修改状态时，会触发通知观察者（依赖的 Composable）。
+	•	Compose 会标记这些 Composable 为“脏”，等待下一帧进行局部重组。
+	•	不会直接更新 UI，而是通过 重组（Recomposition） 在安全的 UI 调度时更新界面。
+
+所以核心确实是 “读收集依赖 + 写通知 + 重组更新”，而不是像传统监听器那样主动刷新界面。
+
 - **Snapshot** 用于在多线程环境下安全管理状态。
 - 核心概念：
   - **MutableSnapshot**：每个线程可以有自己的快照，读写隔离。
