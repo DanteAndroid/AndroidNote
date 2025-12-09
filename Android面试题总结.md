@@ -362,6 +362,12 @@ Kotlin 协程提供了 **CoroutineDispatcher**，它决定协程在哪个线程�
 - **原理**：
   - State 是可观察对象，当其值改变时，会通知依赖它的 Composable 标记为脏。
   - Compose 内部使用 **Snapshot** 来追踪状态变化。
+- **Snapshot** 用于在多线程环境下安全管理状态。
+- 核心概念：
+  - **MutableSnapshot**：每个线程可以有自己的快照，读写隔离。
+  - **Global Snapshot**：用于跨线程合并状态。
+- Compose 使用快照实现 **一致性视图**，即在重组期间 UI 可以安全读取状态，而不会被同时修改破坏。
+
 
 **怎么实现自动追踪状态的**：
 Compose 的 state-driven 本质类似于“重写 get / set”，但是它比普通的 setter 通知机制更复杂和高效：
@@ -374,12 +380,6 @@ Compose 的 state-driven 本质类似于“重写 get / set”，但是它比普
 	•	不会直接更新 UI，而是通过 重组（Recomposition） 在安全的 UI 调度时更新界面。
 
 所以核心确实是 “读收集依赖 + 写通知 + 重组更新”，而不是像传统监听器那样主动刷新界面。
-
-- **Snapshot** 用于在多线程环境下安全管理状态。
-- 核心概念：
-  - **MutableSnapshot**：每个线程可以有自己的快照，读写隔离。
-  - **Global Snapshot**：用于跨线程合并状态。
-- Compose 使用快照实现 **一致性视图**，即在重组期间 UI 可以安全读取状态，而不会被同时修改破坏。
 
 **重组优化**
 
