@@ -62,7 +62,32 @@ SSL/TLS具体的通信过程：client hello中发送客户端支持的加密协�
 
 ## 类加载机制
 
-TODO
+类加载机制本质上就是 Java 虚拟机把类的 .class 文件加载到内存、并转换为 Class 对象的过程。简单来说可以分为几个阶段：
+
+1. **加载（Loading）**
+   - JVM 找到类的二进制数据（通常是 .class 文件），并把它读入内存。
+   - 生成一个 Class 对象来表示这个类。
+   - 这个阶段主要由 **类加载器**（ClassLoader）完成，有三种主要加载器：
+     - **Bootstrap ClassLoader**：加载 JDK 核心类库（如 java.lang.*）。
+     - **Extension ClassLoader**：加载 JDK 扩展类库（jre/lib/ext 下的 jar）。
+     - **App ClassLoader**：加载应用程序类路径（classpath）下的类。
+2. **验证（Verification）**
+   - 确保被加载的类符合 JVM 规范，不会破坏虚拟机安全。
+   - 包括文件格式验证、元数据验证、字节码验证等。
+3. **准备（Preparation）**
+   - 为类的静态变量分配内存，并设置默认初始值（如 0、null）。
+   - 注意这里只是默认值，还没执行静态代码块或显式赋值。
+4. **解析（Resolution）**
+   - 将符号引用（如类名、方法名）替换为直接引用（内存地址）。
+   - 也可以理解为把代码里的符号标识和内存对象对应起来。
+5. **初始化（Initialization）**
+   - 执行类的静态变量显式赋值和静态代码块（static {}）。
+   - 这个阶段是真正开始类的“运行”的阶段。
+6. **使用和卸载**
+   - 类加载后就可以实例化对象、调用方法了。
+   - 如果类不再使用，且没有任何引用，它会被 GC 卸载（卸载条件严格，通常只针对自定义类加载器加载的类）。
+
+简单理解就是：**加载 → 验证 → 准备 → 解析 → 初始化 → 使用/卸载**。
 
 ## 加密与编码
 
@@ -77,20 +102,6 @@ TODO
 let返回值是函数的最后一行；also返回的是对象本身；with可以直接调用对象属性，返回值是函数的最后一行；run=let+with，不需要用it代替对象，返回函数最后一行；apply=let+also，可以直接调用对象属性，返回对象本身
 
 sealed class用来表示有限的类继承结构。是枚举类的扩展，但是枚举类常量只有一个实例，而密封类的一个子类可以有多个包含状态的实例
-
-```
-sealed class Expression
-data class Const(val number: Double) : Expression()
-data class Sum(val e1: Expression, val e2: Expression) : Expression()
-object NotANumber : Expression()
-
-fun eval(expr: Expression): Double = when (expr) {
-    is Const -> expr.number
-    is Sum -> eval(expr.e1) + eval(expr.e2)
-    NotANumber -> Double.NaN
-    // 无需else语句，因为已经覆盖所有情况
-}
-```
 
 **扩展函数**：编译时，根据类名生成对应的工具类以及public static final的方法，把调用者作为第一个参数传入。如果某个类和其子类都进行同名函数的扩展，使用时，会根据扩展方法的对象类型来决定调用哪个，而不是传入对象的最终类型来调用。成员函数与扩展函数冲突时，总是取成员函数
 
@@ -122,34 +133,270 @@ HashMap是先把Key/Value封装成Node对象，然后通过key的hashCode()进�
 
 ## RecyclerView
 
-**绘制**：通过Adapter和四级缓存来创建或者取得缓存的view，然后根据position来进行子view的layout。
+### 绘制流程
 
-**滚动**：通过覆写onInterceptTouchEvent，判断如果是滑动事件，则根据滚动距离调用view.layout来更新所有item的位置，同时对超出屏幕外的item进行回收，对进入屏幕内的item进行创建或从缓存里取得，并通过onBindViewHolder更新view内容。
+- 绘制子 View 由 **LayoutManager** 控制。
+- LayoutManager 先计算可见 item 的位置，然后通过 Recycler.getViewForPosition(position) 获取 View：
+  - 先从 mAttachedScrap 查找；
+  - 再从 mCachedViews 查找；
+  - 再从 RecycledViewPool 获取或新建。
+- 如果获取的 view 是新 view 或需要更新数据，则调用 onBindViewHolder 绑定数据。
 
-**Prefetch**：在惯性滚动时，通过Handler来提前从RecycledViewPool中取出即将显示的item，然后放入mCachedViews中，这样当需要对item进行layout时，就可以直接拿来用而不需要绑定数据了
+### 滚动机制
 
-**四级缓存**：
+- 滚动事件由 onInterceptTouchEvent 判断是否拦截（依据滑动方向和 touchSlop）。
+- LayoutManager 处理实际滚动，通过 scrollBy/scrollVerticallyBy 调整可见 item 位置，并决定：
+  - 超出屏幕的 item 回收；
+  - 新进入屏幕的 item 创建或复用，并绑定数据。
 
-mAttachedScrap：每次layout子view之前，临时存放那些已经添加到recyclerView中的item以及被删除的item。使用场景：滚动过程；可见范围内删除item后调用notifyItemRemoved时
+### 预取机制（Prefetch）
 
-mChangedScrap：存放可见范围内有更新的item。使用场景：可见范围内item更新后调用notifyItemChanged时；临时缓存局部更新，用于播放动画，动画播完viewholder还是会交给recycledViewPool
+- LayoutManager 会在惯性滚动时提前计算即将显示的 item，并调用 Recycler 预取 view，减少滚动卡顿。
+- 预取的 item 可先加入缓存（mCachedViews），滚动到屏幕时直接复用，无需重新绑定。
 
-mCachedViews：存放滚动过程中没有被重新使用且状态无变化的旧item。使用场景：滚动过程；prefetch
+### RecyclerView 四级缓存
 
-RecycledViewPool：缓存item的终点站，用于保存Removed、Changed以及mCachedViews满了以后更旧的item。使用场景：item被移除；item有更新；滚动过程
+1. **mAttachedScrap**：可见范围内被临时移除的 item，用于重用，布局完成后清空。
+2. **mChangedScrap**：可见范围内需要局部更新的 item（例如 notifyItemChanged），动画结束后可能回收。
+3. **mCachedViews**：滚动过程中未被使用、状态未变化的旧 item，用于快速复用。
+4. **RecycledViewPool**：缓存最终站，可跨 RecyclerView 共享，用于存放回收或更新后的 item，减少 view 创建开销。
 
-**与scrollview滑动冲突**：rv的onInterceptTouchEvent方法，判断是否是滑动事件（根据ViewConfiguration拿到touchSlop），判断事件是否在scrollView范围内，如果是，则不拦截
+### 与 ScrollView 滑动冲突
+
+- RecyclerView 的 onInterceptTouchEvent 判断是否拦截滑动。
+- 当嵌套在 ScrollView 内时，通常通过 requestDisallowInterceptTouchEvent(true) 让 RecyclerView 拦截滑动事件，避免冲突。
 
 ## Flutter
 
 **Flutter**: skia引擎，dart语言，跨平台。原理：三个Tree，Widget负责控件的配置信息，Element负责管理生命周期，RenderObject负责绘制（Configuration、LifeCycle、Canvas）。
 
-**Compose**: skia引擎，kotlin，充分利用平台特性。跨平台版本还是experimental的。
+**Compose**: skia引擎，kotlin，充分利用平台特性
 
 ## Glide
 
-TODO
-    
-## Timber
+Glide 在加载图片时，会按顺序依次检查以下缓存：
 
-Timber内部维护tree的数组，通过synchronized保证添加tree时线程安全。tree是抽象类，封装了log的具体打印操作和tag，具体操作最终调用log虚方法，其中包含priority、tag、message、throwable。tag默认从ThreadLocal<String>里线程存的tag取，取不到则从`Throwable().stackTrack`的堆栈信息里解析第一个类名不属于Timber库的类名并生成对应Tag。Timber具体打印方法则会遍历treeArray依次执行log具体方法打印，DebugTree的log方法最终执行了`Log.println(priority, tag, message)`
+1. **活动资源（Active Resources）**
+
+   - 检查当前是否有其他 View 正在使用这张图片。
+   - 如果有，直接返回正在使用的 Bitmap/Drawable，避免重复解码。
+
+2. **内存缓存（Memory Cache）**
+   - LRU Cache，存储最近加载过且未被回收的图片。
+   - 命中则立即返回，保证快速显示。
+
+3. **磁盘缓存 - 已解码资源（Resource Cache）**
+
+   - 检查之前是否已解码、转换并写入磁盘缓存的 Bitmap/Drawable。
+   - 异步加载到内存后返回，避免重复解码和转换。
+
+4. **磁盘缓存 - 原始数据（Data Cache）**
+   - 检查原始图片文件是否已写入磁盘缓存（通常是下载的网络图片）。
+   - 异步解码后返回，可以避免每次都重新从网络下载。
+
+5. **原始资源加载（Source）**
+
+   - 如果以上步骤都未命中，则回退到原始来源：网络、资源文件、Uri 等。
+   - 下载/读取后，再写入缓存，供下次使用。
+
+
+
+
+   ## **Coil 核心流程**
+
+1. **请求发起**
+
+```
+imageView.load(url)
+```
+
+创建 ImageRequest，包含数据源、协程上下文、缓存策略、占位图和转换器等。
+
+1. **检查缓存**
+
+   先查内存缓存（LRU 存储已解码的 Bitmap/Drawable），命中直接返回；再查磁盘缓存（基于 OkHttp 存储原始数据），异步解码后写入内存缓存。Coil 没有 Glide 那种多层缓存和 BitmapPool。
+
+2. **协程异步加载**
+
+   网络下载、文件读取、解码都在 Dispatcher.IO 或自定义调度器中执行。支持挂起函数，Activity/Fragment 销毁时自动取消，避免内存泄漏或无效加载。
+
+3. **解码与转换**
+
+   使用 Decoder 将原始数据解码为 Bitmap/Drawable，可做圆角、模糊等 Transformation，加载完成写入内存缓存。
+
+4. **显示到 ImageView**
+
+   切换到主线程显示图片，协程保证异步安全，不阻塞 UI。   
+
+| **特性**     | **Glide**                                  | **Coil**                           |
+| ------------ | ------------------------------------------ | ---------------------------------- |
+| 异步机制     | 线程池                                     | 协程挂起函数                       |
+| 内存复用     | BitmapPool                                 | 系统管理，不手动复用               |
+| 缓存层级     | Active → Memory → Resource → Data → Source | Memory → Disk → Source             |
+| API 风格     | Java/Kotlin 链式                           | Kotlin DSL 风格，更轻量            |
+| 生命周期管理 | RequestManager 感知生命周期                | 协程自动绑定生命周期，自动取消请求 |
+
+**Coil 核心在于用协程安全、轻量、现代化地异步加载图片，同时利用内存和 OkHttp 缓存减少重复解码和网络请求，而不依赖 Glide 那种复杂的多层缓存和 BitmapPool。**
+
+   
+
+## 每个App都是单独的虚拟机？
+
+每个 App 都运行在自己独立的进程中，并且在这个进程中会启动一个专用的运行时环境（Runtime），你可以将其理解为“虚拟机”或“运行时”。
+
+这个运行时环境在不同的版本中有不同的名字：
+
+### Android 运行时环境 (ART & Dalvik)
+
+1. Android 5.0 之后（主流）：ART
+
+   从 Android 5.0 (Lollipop) 开始，ART (Android Runtime) 彻底取代了 Dalvik，成为了默认的运行时环境。
+
+   - 每个 App 进程 都会创建一个 ART 实例 来执行它的代码。
+   - ART 实现了 AOT (Ahead-Of-Time) 编译，在 App 安装时就把 DEX 字节码预先编译成机器码，大大提高了 App 的启动和运行速度。
+   - **独立性： 每个 App 依然拥有一个独立的 ART 实例和独立的进程，确保了 App 之间的隔离性、安全性和稳定性。一个 App 崩溃不会影响其他 App。**
+
+2. Android 5.0 之前：Dalvik
+
+   在 Android 5.0 之前，App 运行在 Dalvik 虚拟机 (DVM) 中。
+
+   - 同样，每个 App 进程 都有一个 DVM 实例。
+   - DVM 采用 JIT (Just-In-Time) 编译，在 App 运行时即时编译字节码。
+
+无论是 Dalvik 还是 ART，它们的核心设计哲学都是：
+
+- **进程隔离：** 每个 App 运行在一个独立的 Linux 进程中。
+- **沙箱机制 (Sandbox)：** App 之间的文件、内存和资源是相互隔离的，没有授权不能互相访问，这就像把每个 App 放在一个“沙箱”里运行。
+
+所以，虽然严格来说 ART/Dalvik 不是传统的 Java 虚拟机 (JVM)，但它们在 Android 中起到了类似的作用：为每个 App 提供一个独立、安全、专用的代码执行环境。你可以形象地将这个“独立的进程 + 独立的 ART/Dalvik 实例” 理解为“每个 App 一个虚拟机”
+
+
+
+## 协程机制
+
+协程的核心机制本质上是**轻量级的线程与状态机结合**，它通过挂起与恢复来实现异步或并发执行，而不占用系统线程资源。可以从以下几个角度来理解：
+
+---
+
+### 1. **挂起与恢复**
+- 协程中的 `suspend` 函数可以挂起当前协程而不阻塞线程。
+- 挂起时，协程的执行状态（包括局部变量、调用栈等）会被保存到一个对象中，这就是 **Continuation（续体）**。
+- 恢复时，Continuation 会记录上一次挂起的位置，直接从挂起点继续执行。
+
+### 2. **Continuation接口**
+
+```
+interface Continuation<in T> {
+    val context: CoroutineContext
+    fun resumeWith(result: Result<T>)
+}
+```
+Continuation 会保存
+
+- 局部变量：挂起时的局部变量会被存储到 Continuation 的字段里。
+- label：表示下次恢复的状态。
+- context：协程上下文，用于调度和异常处理。
+
+因此，调用 resumeWith(result) 时，状态机会检查 label，然后执行对应代码块，并把之前保存的局部变量恢复到作用域中。
+
+### 3. **状态机实现**
+- Kotlin 编译器会将 `suspend` 函数编译成状态机。
+- 每个挂起点对应一个状态（label），执行时根据状态跳转。
+- 这就是为什么协程可以在一个线程里多次挂起和恢复而不会丢失状态。
+
+### **线程池在协程中的作用**
+
+Kotlin 协程提供了 **CoroutineDispatcher**，它决定协程在哪个线程或线程池上执行。
+
+常用的调度器：
+
+- Dispatchers.Default：底层是**共享的通用线程池**，适合 CPU 密集型任务。
+- Dispatchers.IO：底层也是线程池，但线程数量可伸缩，适合 IO 密集型任务。
+- Dispatchers.Main：主线程（UI 线程），没有线程池。
+- 自定义 newSingleThreadContext 或 Executor.asCoroutineDispatcher() 可以绑定自定义线程池。
+
+协程调度器会把协程任务提交给线程池执行，但协程本身只是一个**任务单元**，不会直接创建线程。
+
+### 为什么协程挂起不占用线程
+
+因为协程是状态机+Continuation
+- 挂起函数立即返回，线程可以继续执行其他任务。
+- 当协程需要恢复时，调度器调用 Continuation 的 resume 方法，从上次挂起的位置继续执行。
+
+
+
+## Compose 核心机制
+
+**Composable 函数**
+
+- 不同于传统 View 系统，Compose 不直接操作 View 层，而是通过 **函数声明 UI**，根据状态生成 UI。
+- UI 的描述是函数的结果，状态改变时，函数可以被重新调用生成新的 UI。
+
+**Compose Compiler**
+
+- @Composable 函数在编译期由 **Compose Compiler** 转换：
+  - 增加 Composer 参数，用于管理 SlotTable 和重组。
+  - 增加 changed 位掩码，用于快速判断参数是否变化。
+  - 插入 startRestartGroup / endRestartGroup 标记重组边界。
+- 优化点：
+  - 未变化参数跳过重组。
+  - Lambda 缓存避免重复对象。
+  - Inline 提高性能。
+
+**重组（Recomposition）**
+
+- 是 Compose 响应状态变化重新生成 UI 的过程。
+- 当 **State** 发生变化时，Compose 会标记依赖这个 State 的 Composable 为 **脏（dirty）**。
+- Compose 在下一次重组时，只会重新执行这些脏的 Composable，而不是整个 UI 树。
+- **核心数据结构**：
+  - **SlotTable**：Compose 内部存储函数调用和 UI 层次的表格，用于跟踪 Composable 的位置、状态和子树。
+  - **Recomposer**：负责调度脏的 Composable 执行重组。
+
+**状态管理（State）**
+
+- **State** 是 Compose 响应式 UI 的基础。
+- Compose 提供：
+  - mutableStateOf
+  - remember / rememberSaveable
+  - derivedStateOf
+- **原理**：
+  - State 是可观察对象，当其值改变时，会通知依赖它的 Composable 标记为脏。
+  - Compose 内部使用 **Snapshot** 来追踪状态变化。
+
+- **Snapshot** 用于在多线程环境下安全管理状态。
+- 核心概念：
+  - **MutableSnapshot**：每个线程可以有自己的快照，读写隔离。
+  - **Global Snapshot**：用于跨线程合并状态。
+- Compose 使用快照实现 **一致性视图**，即在重组期间 UI 可以安全读取状态，而不会被同时修改破坏。
+
+**重组优化**
+
+- Compose 会尽量减少重组开销：
+
+  - 仅脏 Composable 会重组。
+  - remember 用于缓存值避免重复计算。
+  - derivedStateOf 用于避免不必要的重组。
+  - Compose 会维护函数调用的 **SlotTable**，通过位置和 key 来识别 Composable 是否需要重新执行。
+
+**布局与绘制（Layout & Draw）**
+
+- Compose 的布局与绘制机制类似于传统 View，但完全在 Compose 内部实现：
+  1. **Measure**：测量子 Composable 尺寸。
+  2. **Layout**：确定每个子 Composable 的位置。
+  3. **Draw**：绘制到 Canvas 上。
+- Compose 使用 **布局修饰符（Modifier）链式调用**，在布局、绘制、触摸事件处理等环节灵活扩展。
+
+**协程与异步**
+
+- Compose 与 **协程高度集成**：
+  - LaunchedEffect、rememberCoroutineScope 等用于在 Composable 内安全执行异步操作。
+  - 状态变化在协程内更新时，会自动触发重组。
+
+**总结核心流程**
+
+1. Composable 函数执行生成 **UI 描述树（SlotTable）**。
+2. State 发生变化 → Recomposer 标记脏节点。
+3. Recomposer 调度脏节点重组 → Composable 函数重新执行。
+4. 生成新的 UI 描述 → Compose 将差异应用到实际绘制上。
+5. 通过 Snapshot 保证状态一致性，Modifier 控制布局、绘制、交互。
+
